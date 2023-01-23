@@ -29,6 +29,14 @@ namespace IXLA_SDK
     public class IXLAWebService : System.Web.Services.WebService
     {
 
+
+
+
+        //******************************************************************************************************************************************************
+        //  Insert method
+        //******************************************************************************************************************************************************
+
+
         [WebMethod]
         public string Insert(string Ip, int Port)
         {
@@ -88,7 +96,85 @@ namespace IXLA_SDK
             return result;
         }
 
+
+
+
+        //******************************************************************************************************************************************************
+        // loadLayoutToSamLight
+        //******************************************************************************************************************************************************
+        // This method just for loading the full layout for each IXLA printer to the samLight for Autopos perpos .
+        // you need to use MarkLayoutWithAutopos method after run this method to mark the layout .
+        // Note : be sure to convert the entites that you dont need to mark to NonMarkableEntites in the SamLight after use this method .
+        
+
+
+        [WebMethod]
+        public string loadFullLayoutToSamLight(string Ip, int Port, string SerialNumber)
+        {
+
+
+            // them machine client is written in such a way that prevents to execute commands in parallel
+            // if you want to handle encoding and marking in parallel the simplest implementation would 
+            // be to use a second instance (that connects to port 5556) where you send the commands for 
+            // the encoder (connect2rfid and transmit2rfid)
+            var result = Task.Run(async () =>
+            {
+
+
+                var client = new MachineClient();
+                await client.ConnectAsync(Ip, Port, CancellationToken.None).ConfigureAwait(false);
+
+
+
+
+
+                try
+                {
+
+                    var machineApi = new MachineApi(client);
+
+
+
+                    await machineApi.ResetAsync().ConfigureAwait(false);
+
+                    // load a new Layout
+
+                    await machineApi.LoadDocumentAsync("layout", System.IO.File.ReadAllBytes("\\Users\\admin\\Desktop\\IraqLayoutNew\\all Printer\\" + SerialNumber + "\\" + SerialNumber + "Layout.sjf")).ConfigureAwait(false);
+                   
+
+                    return "Ok";
+                }
+                catch (Exception e)
+                {
+                    return e.ToString();
+                }
+                finally
+                {
+                    try
+                    {
+                        // graceful disconnect sends \r\n before disposing the stream
+                        // to avoid hanging connections server side
+                        Console.WriteLine("Graceful disconnect...");
+
+                        await client.GracefulDisconnectAsync().ConfigureAwait(false);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }).Result;
+
+
+            return result;
+        }
+
+
+
+        //******************************************************************************************************************************************************
         //  MarkLayout method
+        //******************************************************************************************************************************************************
+
+       
 
 
 
@@ -143,7 +229,7 @@ namespace IXLA_SDK
                     if (Photo == String.Empty) // done
                     {
 
-                        Photo = "photo1";
+                        Photo = "photo1.bmp";
 
                     }
 
@@ -279,10 +365,12 @@ namespace IXLA_SDK
             return result;
         }
 
-
-
-
+        //******************************************************************************************************************************************************
         // check reader stablity
+        //******************************************************************************************************************************************************
+
+
+        
 
         [WebMethod]
         public string checkReaderFullCycle(string Ip, int Port)
@@ -356,8 +444,10 @@ namespace IXLA_SDK
 
 
 
-
+        //******************************************************************************************************************************************************
         //  Eject method
+        //******************************************************************************************************************************************************
+        
 
 
         [WebMethod]
