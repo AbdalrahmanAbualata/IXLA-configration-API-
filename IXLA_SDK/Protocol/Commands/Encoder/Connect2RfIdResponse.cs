@@ -5,7 +5,8 @@ namespace IXLA.Sdk.Xp24.Protocol.Commands.Encoder
 {
     public class Connect2RfIdResponse : MachineResponseBase
     {
-        public byte[] Atr { get; set; }
+        //public byte[] Atr { get; set; }
+        public string Atr { get; set; }
         public Connect2RfIdResponse(MachineCommand command) : base(command)
         {
         }
@@ -14,7 +15,9 @@ namespace IXLA.Sdk.Xp24.Protocol.Commands.Encoder
         {
             var atr = reader.GetAttribute("ATR");
             if (string.IsNullOrEmpty(atr)) return;
-            Atr = Convert.FromBase64String(atr);
+
+            //Atr = Convert.FromBase64String(atr);
+            Atr = atr;
         }
     }
 }
