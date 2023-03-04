@@ -332,7 +332,7 @@ namespace IXLA_SDK
 
 
         //******************************************************************************************************************************************************
-        //  mark Uploded Full Layout With Autopos method
+        //  Update documat with provided value
         //******************************************************************************************************************************************************
         //use this method after  loadFullLayoutToSamLight and be sure that all the entites is nonmarkable entite expext the one that you ned to modify the position on it .
 
